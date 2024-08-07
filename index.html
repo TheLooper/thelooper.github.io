@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSRS Stats</title>
+
+    <style>
+            rune {
+                border: 2px solid black;
+                padding: 25px;
+                background: url(mountain.jpg);
+                background-repeat: no-repeat;
+                background-size: auto;
+            }
+            h1 {
+                color: white;
+            }
+            h2 {
+                color: red;
+            }
+            h1, h2 {
+                text-align: center;
+            }
+
+            body {
+                font-family: Papyrus, fantasy;
+                margin: 20px;
+                background-color: #323232;
+                background-image: url('BodyRune.png');
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: 100% 100%;
+                color: #e8a807;
+            }
+
+            .circle-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                width: 180px; /* Half the original width */
+                height: 180px; /* Half the original height */
+                border-radius: 50%;
+                margin: 0 auto;
+
+            }
+
+            .skill-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 30px; /* Half the original width */
+                height: 30px; /* Half the original height */
+                margin: 2.5px; /* Half the original margin */
+                text-align: center;
+                color: #e8a807;
+            }
+
+            .skill-icon {
+                width: 15px; /* Half the original width */
+                height: 15px; /* Half the original height */
+                margin-bottom: 2.5px; /* Half the original margin */
+            }
+    </style>
+</head>
+<body>
+    <h1>Godofclowns</h1>
+    <h2 id="combatLevel">Combat Level: Calculating...</h2>
+    <div class="circle-container" id="skillsContainer">
+    </div>
+
+    <script>
+        async function fetchStats() {
+            const username = 'godofclowns';
+            const response = await fetch(`https://api.wiseoldman.net/v2/players/${username}/snapshots`);
+            const data = await response.json();
+
+            const latestSnapshot = data[0].data.skills;
+            const skillsContainer = document.getElementById('skillsContainer');
+            skillsContainer.innerHTML = '';
+
+            const levels = {
+                attack: latestSnapshot.attack.level,
+                strength: latestSnapshot.strength.level,
+                defence: latestSnapshot.defence.level,
+                hitpoints: latestSnapshot.hitpoints.level,
+                ranged: latestSnapshot.ranged.level,
+                prayer: latestSnapshot.prayer.level,
+                magic: latestSnapshot.magic.level,
+                cooking: latestSnapshot.cooking.level,
+                woodcutting: latestSnapshot.woodcutting.level,
+                fletching: latestSnapshot.fletching.level,
+                fishing: latestSnapshot.fishing.level,
+                firemaking: latestSnapshot.firemaking.level,
+                crafting: latestSnapshot.crafting.level,
+                smithing: latestSnapshot.smithing.level,
+                mining: latestSnapshot.mining.level,
+                herblore: latestSnapshot.herblore.level,
+                agility: latestSnapshot.agility.level,
+                thieving: latestSnapshot.thieving.level,
+                slayer: latestSnapshot.slayer.level,
+                farming: latestSnapshot.farming.level,
+                runecrafting: latestSnapshot.runecrafting.level,
+                hunter: latestSnapshot.hunter.level,
+                construction: latestSnapshot.construction.level
+            };
+
+            const combatLevel = calculateCombatLevel(levels);
+            document.getElementById('combatLevel').innerText = `Combat Level: ${combatLevel}`;
+
+            const skillIcons = {
+                attack: 'stats/attack.png',
+                defence: 'stats/defence.png',
+                strength: 'stats/strength.png',
+                hitpoints: 'stats/hitpoints.png',
+                ranged: 'stats/ranged.png',
+                prayer: 'stats/prayer.png',
+                magic: 'stats/magic.png',
+                cooking: 'stats/cooking.png',
+                woodcutting: 'stats/woodcutting.png',
+                fletching: 'stats/fletching.png',
+                fishing: 'stats/fishing.png',
+                firemaking: 'stats/firemaking.png',
+                crafting: 'stats/crafting.png',
+                smithing: 'stats/smithing.png',
+                mining: 'stats/mining.png',
+                herblore: 'stats/herblore.png',
+                agility: 'stats/agility.png',
+                thieving: 'stats/thieving.png',
+                slayer: 'stats/slayer.png',
+                farming: 'stats/farming.png',
+                runecrafting: 'stats/runecraft.png',
+                hunter: 'stats/hunter.png',
+                construction: 'stats/construction.png'
+            };
+
+            const skills = Object.entries(levels);
+
+            skills.forEach(([skill, level]) => {
+                const skillItem = document.createElement('div');
+                skillItem.className = 'skill-item';
+                skillItem.innerHTML = `<img class="skill-icon" src="${skillIcons[skill]}" alt="${skill} icon"><span>${level}</span>`;
+                skillsContainer.appendChild(skillItem);
+            });
+        }
+
+        function calculateCombatLevel(levels) {
+            const base = 0.25 * (levels.defence + levels.hitpoints + Math.floor(levels.prayer / 2));
+            const melee = 0.325 * (levels.attack + levels.strength);
+            const range = 0.325 * (Math.floor(levels.ranged / 2) + levels.ranged);
+            const mage = 0.325 * (Math.floor(levels.magic / 2) + levels.magic);
+            return Math.floor(base + Math.max(melee, range, mage));
+        }
+
+        fetchStats();
+    </script>
+</body>
+</html>
